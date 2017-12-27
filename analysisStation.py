@@ -20,7 +20,9 @@ from docopt import docopt
 import requests
 from prettytable import PrettyTable
 import json
+from colorama import init, Fore
 
+init()
 
 def cli():
     arguments = docopt(__doc__)
@@ -35,17 +37,22 @@ def cli():
     pt = PrettyTable()
     pt._set_field_names(headers)
 
+    resp = dict(resp.json())
+
+    #把数据写到stationData.json里
+    # 这里是为了分析数据格式，因为12306的数据格式经常变
+    # with open('stationData.json', 'w') as f:
+    #     json.dump(resp, f, ensure_ascii=False)
+
     #假数据用于测试
     # filename = 'stationData.json'
     # with open(filename, encoding='utf-8') as f:
     #     pop_data = json.load(f)
     # resp = pop_data
 
-    resp = dict(resp.json())
     rows = resp['data']['result']
-
     for row in rows:
-        print(row)
+        # print(row)
         s = parse(row)
         pt.add_row([
             s['train'], resp['data']['map'].get(
