@@ -51,13 +51,14 @@ def cli():
     stationsDict = dict((v, k) for k, v in stationsInfo.items())
 
     data = Station(dict(resp.json())['data']['result'])
-    data.print(stationsDict) # 为了正确显示，将翻转后的车次的字典传进去
+    data.print(stationsDict)  # 为了正确显示，将翻转后的车次的字典传进去
+
 
 class Station(object):
     def __init__(self, stationDataInfos):
-        self.stationDataInfos = stationDataInfos
+        self.__stationDataInfos = stationDataInfos
 
-    def parse(self,stationDataInfo):
+    def parse(self, stationDataInfo):
         coms = stationDataInfo.split('|')
         # i = 0
         # while i < len(coms):
@@ -87,19 +88,28 @@ class Station(object):
         stationDataInfo['other'] = coms[21]
         return stationDataInfo
 
-    def print(self,stationsDict):
+    def get_stationDataInfos(self):
+        return self.__stationDataInfos
+
+    def print(self, stationsDict):
         headers = '车次 车站 时间 历时 商务 一等 二等 软卧 硬卧 软座 硬座 无座'.split()
         pt = PrettyTable()
         pt._set_field_names(headers)
-        for row in self.stationDataInfos:
+        for row in self.__stationDataInfos:
             s = self.parse(row)
             pt.add_row([
-                s['train'],
-                '\n'.join([Fore.GREEN + stationsDict.get(s['s1']) + Fore.RESET,Fore.RED + stationsDict.get(s['s4']) + Fore.RESET]),
-                '\n'.join([Fore.GREEN + s['start_time'] + Fore.RESET,Fore.RED + s['arrive_time'] + Fore.RESET]),
-                s['spent_time'], s['business_class'], s['one_class'],s['two_class'], s['soft_bed'], s['hard_bed'], s['soft_seat'],
-                s['hard_seat'], s['no_seat']])
+                s['train'], '\n'.join([
+                    Fore.GREEN + stationsDict.get(s['s1']) + Fore.RESET,
+                    Fore.RED + stationsDict.get(s['s4']) + Fore.RESET
+                ]), '\n'.join([
+                    Fore.GREEN + s['start_time'] + Fore.RESET,
+                    Fore.RED + s['arrive_time'] + Fore.RESET
+                ]), s['spent_time'], s['business_class'], s['one_class'],
+                s['two_class'], s['soft_bed'], s['hard_bed'], s['soft_seat'],
+                s['hard_seat'], s['no_seat']
+            ])
         print(pt)
+
 
 if __name__ == "__main__":
     cli()
