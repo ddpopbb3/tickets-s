@@ -24,6 +24,7 @@ from colorama import init, Fore
 
 init()
 
+
 def cli():
     arguments = docopt(__doc__)
     print(arguments)
@@ -32,8 +33,9 @@ def cli():
     date = arguments['<date>']
     url = 'https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date={}&leftTicketDTO.from_station={}&leftTicketDTO.to_station={}&purpose_codes=ADULT'.format(
         date, from_station, to_station)
-    resp = requests.get(url, verify=False)
-    headers = '车次 出发站 终点站 发车时间 结束时间 历时 商务 一等 二等 软卧 硬卧 软座 硬座 无座'.split()
+    resp = requests.get(url)   
+    # resp = requests.get(url, verify=False) #这里不懂教程里为什么不验证合法性
+    headers = '车次 车站 时间 历时 商务 一等 二等 软卧 硬卧 软座 硬座 无座'.split()
     pt = PrettyTable()
     pt._set_field_names(headers)
 
@@ -50,16 +52,19 @@ def cli():
     #     pop_data = json.load(f)
     # resp = pop_data
 
+    #翻转键值
+    stationsDict = dict((v, k) for k, v in stationsInfo.items())
+
     rows = resp['data']['result']
     for row in rows:
-        # print(row)
         s = parse(row)
         pt.add_row([
-            s['train'], resp['data']['map'].get(
-                s['s1']), resp['data']['map'].get(s['s4']), s['start_time'],
-            s['arrive_time'], s['spent_time'], s['business_class'],
-            s['one_class'], s['two_class'], s['soft_bed'], s['hard_bed'],
-            s['soft_seat'], s['hard_seat'], s['no_seat']
+            s['train'],
+            '\n'.join([Fore.GREEN + stationsDict.get(s['s1'])+ Fore.RESET,Fore.RED +  stationsDict.get(s['s4'])+ Fore.RESET]), 
+            '\n'.join([Fore.GREEN + s['start_time'] + Fore.RESET,Fore.RED + s['arrive_time'] + Fore.RESET]), 
+            s['spent_time'],
+            s['business_class'], s['one_class'], s['two_class'], s['soft_bed'],
+            s['hard_bed'], s['soft_seat'], s['hard_seat'], s['no_seat']
         ])
     print(pt)
 
