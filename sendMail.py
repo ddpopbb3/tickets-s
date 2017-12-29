@@ -3,7 +3,7 @@ msg = MIMEText('hello, send by Python...', 'plain', 'utf-8')
 
 # 输入Email地址和口令:
 from_addr = input('From:1520024947@qq.com')
-password = input('Password:159632478abcde')
+password = input('Password:******')
 # 输入收件人地址:
 to_addr = input('To:liyp@primeton.com')
 # 输入SMTP服务器地址:
